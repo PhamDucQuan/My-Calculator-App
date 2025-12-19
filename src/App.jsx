@@ -454,8 +454,30 @@ export default function App() {
       } else if (/[l]|lô|lo/.test(lowerCaseNumberString)) {
         // Vẫn dùng logic cũ cho Lô (chỉ lấy số thường)
         const cleanStr = numberString.replace(/[l]|lô|lo|[x]|xi|xiên/gi, ' ');
-        const foundNumbers = cleanStr.match(/\d+/g);
-        const count = foundNumbers ? foundNumbers.length : 0;
+        const rawNumbers = cleanStr.match(/\d+/g);
+        
+        let foundNumbers = [];
+        if (rawNumbers) {
+            rawNumbers.forEach(num => {
+                // Logic tách số gánh: 151 -> 15 và 51
+                if (num.length === 3) {
+                    foundNumbers.push(num.substring(0, 2)); // Lấy 2 số đầu (15)
+                    foundNumbers.push(num.substring(1, 3)); // Lấy 2 số cuối (51)
+                } else {
+                    // Số bình thường (2 chữ số) thì giữ nguyên
+                    // Thêm logic: Nếu nhập 1 số (vd: 5) thì tự thêm số 0 đằng trước (05) để so khớp đúng với kết quả
+                    if (num.length === 1) {
+                        foundNumbers.push('0' + num);
+                    } else {
+                        foundNumbers.push(num);
+                    }
+                }
+            });
+        }
+
+        // --- SỬA LỖI Ở ĐÂY: Tính lại biến count dựa trên mảng mới ---
+        const count = foundNumbers.length; 
+        // -----------------------------------------------------------
 
         if (count > 0 && amountValue > 0) {
              // Thu
